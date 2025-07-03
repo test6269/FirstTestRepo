@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rudra AI - Smarter. Faster. Always Learning.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #16213e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* 3D Canvas Background */
+        #threejs-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Animated background particles */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-100px) rotate(180deg); opacity: 1; }
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #8b5cf6;
+        }
+
+        /* 3D Floating Card */
+        .floating-3d-card {
+            position: absolute;
+            width: 200px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transform-style: preserve-3d;
+            animation: float3d 6s ease-in-out infinite;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .floating-3d-card:hover {
+            transform: rotateY(20deg) rotateX(10deg) scale(1.05);
+        }
+
+        @keyframes float3d {
+            0%, 100% { 
+                transform: translateY(0px) rotateY(0deg) rotateX(0deg);
+            }
+            50% { 
+                transform: translateY(-30px) rotateY(10deg) rotateX(5deg);
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.3)); }
+            to { filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.6)); }
+        }
+
+        .tagline {
+            font-size: 1.25rem;
+            color: #a1a1aa;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .cta-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Chat Preview */
+        .chat-preview {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .chat-window {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .chat-header {
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chat-dots {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot:nth-child(1) { background: #ff5f57; }
+        .dot:nth-child(2) { background: #ffbd2e; }
+        .dot:nth-child(3) { background: #28ca42; }
+
+        .chat-title {
+            margin-left: auto;
+            font-size: 0.9rem;
+            color: #a1a1aa;
+        }
+
+        .chat-messages {
+            padding: 2rem;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .user .message-avatar {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .ai .message-avatar {
+            background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .user .message-content {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .ai .message-content {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 0.3rem;
+            padding: 0.5rem;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #6366f1;
+            border-radius: 50%;
+            animation: typing 1.4s ease-in-out infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; transform: scale(1); }
+            30% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Sections */
+        .section {
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .section-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #a1a1aa;
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Capabilities Grid */
+        .capabilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .capability-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .capability-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.1);
+        }
+
+        .capability-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .capability-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .capability-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .capability-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .capability-description {
+            color: #a1a1aa;
+            line-height: 1.6;
+        }
+
+        /* Purpose Section */
+        .purpose-section {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+        }
+
+        .purpose-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .purpose-item {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .purpose-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .purpose-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .purpose-description {
+            color: #a1a1aa;
+            line-height: 1.6;
+        }
+
+        /* Automation Section */
+        .automation-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .automation-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .automation-card:hover {
+            transform: scale(1.02);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .automation-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .automation-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .automation-subtitle {
+            color: #a1a1aa;
+            font-size: 0.9rem;
+        }
+
+        .automation-content {
+            padding: 1.5rem;
+        }
+
+        .automation-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .automation-list li {
+            padding: 0.5rem 0;
+            color: #a1a1aa;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .automation-list li:before {
+            content: '✨';
+            color: #8b5cf6;
+        }
+
+        /* Interactive Chat Section */
+        .chat-section {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.05), rgba(6, 182, 212, 0.05));
+        }
+
+        .interactive-chat {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .chat-input-container {
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 1rem 4rem 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .chat-send {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Floating elements */
+        .floating-icon {
+            position: absolute;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 50%;
+            animation: float-icon 4s ease-in-out infinite;
+        }
+
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding: 6rem 1rem 2rem;
+            }
+
+            .cta-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                min-width: 200px;
+                justify-content: center;
+            }
+
+            .chat-preview {
+                padding: 1rem;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .floating-3d-card {
+                display: none;
+            }
+
+            .capabilities-grid,
+            .purpose-grid,
+            .automation-showcase {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Canvas -->
+    <canvas id="threejs-canvas"></canvas>
+
+    <!-- Animated background -->
+    <div class="bg-particles" id="particles"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Rudra AI</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#capabilities">Capabilities</a></li>
+                <li><a href="#purpose">Purpose</a></li>
+                <li><a href="#automation">Automation</a></li>
+                <li><a href="#chat">Chat</a></li>
+                <li><a href="#download">Download</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-container">
+            <h1>Rudra AI</h1>
+            <p class="tagline">Smarter. Faster. Always Learning.</p>
+            
+            <div class="cta-container">
+                <a href="#download" class="btn btn-primary">
+                    <span>⬇</span> Download Rudra AI
+                </a>
+                <a href="#chat" class="btn btn-secondary">
+                    <span>💬</span> Try Chat Demo
+                </a>
+            </div>
+
+            <!-- Chat Preview -->
+            <div class="chat-preview">
+                <div class="chat-window">
+                    <div class="chat-header">
+                        <div class="chat-dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <div class="chat-title">Rudra AI Chat</div>
+                    </div>
+                    <div class="chat-messages" id="demoMessages">
+                        <div class="message ai">
+                            <div class="message-avatar">R</div>
+                            <div class="message-content">
+                                Hello! I'm Rudra AI. I can help you with coding, analysis, creative tasks, and much more. What would you like to explore today?
+                            </div>
+                        </div>
+                        <div class="message user">
+                            <div class="message-avatar">U</div>
+                            <div class="message-content">
+                                Can you help me build a Python web scraper?
+                            </div>
+                        </div>
+                        <div class="message ai">
+                            <div class="message-avatar">R</div>
+                            <div class="message-content">
+                                Absolutely! I'll help you create a robust Python web scraper. Let's start with the basics using requests and BeautifulSoup...
+                            </div>
+                        </div>
+                        <div class="message ai" id="typingMessage" style="display: none;">
+                            <div class="message-avatar">R</div>
+                            <div class="message-content">
+                                <div class="typing-indicator">
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                    <div class="typing-dot"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3D Floating Cards -->
+        <div class="floating-3d-card" style="top: 15%; left: 5%; animation-delay: 0s;">🤖</div>
+        <div class="floating-3d-card" style="top: 25%; right: 8%; animation-delay: 2s;">⚡</div>
+        <div class="floating-3d-card" style="bottom: 25%; left: 10%; animation-delay: 4s;">🧠</div>
+        <div class="floating-3d-card" style="bottom: 40%; right: 15%; animation-delay: 1s;">🚀</div>
+    </section>
+
+    <!-- What AI Can Do Section -->
+    <section class="section" id="capabilities">
+        <div class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">What Rudra AI Can Do</h2>
+                <p class="section-subtitle">Unlock the full potential of artificial intelligence with capabilities that transform how you work, create, and innovate.</p>
+            </div>
+
+            <div class="capabilities-grid">
+                <div class="capability-card">
+                    <span class="capability-icon">💻</span>
+                    <h3 class="capability-title">Code Generation & Review</h3>
+                    <p class="capability-description">Write, debug, and optimize code in multiple programming languages. From simple scripts to complex applications, Rudra AI understands your requirements and delivers clean, efficient code.</p>
+                </div>
+
+                <div class="capability-card">
+                    <span class="capability-icon">📊</span>
+                    <h3 class="capability-title">Data Analysis & Insights</h3>
+                    <p class="capability-description">Process large datasets, create visualizations, and extract meaningful insights. Transform raw data into actionable intelligence with advanced statistical analysis and machine learning.</p>
+                </div>
+
+                <div class="capability-card">
+                    <span class="capability-icon">✍️</span>
+                    <h3 class="capability-title">Content Creation</h3>
+                    <p class="capability-description">Generate high-quality articles, marketing copy, technical documentation, and creative writing. Maintain your brand voice while scaling content production effortlessly.</p>
+                </div>
+
+                <div class="capability-card">
+                    <span class="capability-icon">🔍</span>
+                    <h3 class="capability-title">Research & Analysis</h3>
+                    <p class="capability-description">Conduct comprehensive research, summarize complex documents, and provide detailed analysis on any topic. Stay informed with AI-powered research assistance.</p>
+                </div>
+
+                <div class="capability-card">
+                    <span class="capability-icon">🎨</span>
+                    <h3 class="capability-title">Creative Problem Solving</h3>
+                    <p class="capability-description">Brainstorm innovative solutions, generate creative ideas, and approach challenges from multiple perspectives. Unlock creativity with AI-powered ideation.</p>
+                </div>
+
+                <div class="capability-card">
+                    <span class="capability-icon">🌐</span>
+                    <h3 class="capability-title">Language Translation</h3>
+                    <p class="capability-description">Break down language barriers with accurate translation and localization services. Communicate globally with context-aware translation that preserves meaning and nuance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Purpose of AI Section -->
+    <section class="section purpose-section" id="purpose">
+        <div class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">The Purpose of AI</h2>
+                <p class="section-subtitle">Artificial Intelligence exists to augment human capabilities, solve complex problems, and create a more efficient, innovative world.</p>
+            </div>
+
+            <div class="purpose-grid">
+                <div class="purpose-item">
+                    <span class="purpose-icon">🚀</span>
+                    <h3 class="purpose-title">Accelerate Innovation</h3>
+                    <p class="purpose-description">AI speeds up research, development, and creative processes, allowing humans to focus on higher-level strategic thinking and innovation.</p>
+                </div>
+
+                <div class="purpose-item">
+                    <span class="purpose-icon">🎯</span>
+                    <h3 class="purpose-title">Enhance Decision Making</h3>
+                    <p class="purpose-description">Process vast amounts of data to provide insights and recommendations, enabling more informed and accurate decision-making across all domains.</p>
+                </div>
+
+                <div class="purpose-item">
+                    <span class="purpose-icon">⚡</span>
+                    <h3 class="purpose-title">Automate Repetitive Tasks</h3>
+                    <p class="purpose-description">Free humans from mundane, repetitive work by automating routine tasks, allowing focus on creative and strategic activities.</p>
+                </div>
+
+                <div class="purpose-item">
+                    <span class="purpose-icon">🌍</span>
+                    <h3 class="purpose-title">Solve Global Challenges</h3>
+                    <p class="purpose-description">Address complex global issues like climate change, healthcare, and education through advanced modeling and optimization.</p>
+                </div>
+
+                <div class="purpose-item">
+                    <span class="purpose-icon">🤝</span>
+                    <h3 class="purpose-title">Democratize Expertise</h3>
+                    <p class="purpose-description">Make specialized knowledge and capabilities accessible to everyone, regardless of background or resources.</p>
+                </div>
+
+                <div class="purpose-item">
+                    <span class="purpose-icon">📈</span>
+                    <h3 class="purpose-title">Drive Efficiency</h3>
+                    <p class="purpose-description">Optimize processes, reduce waste, and improve productivity across industries, creating more sustainable and efficient systems.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Automation Capabilities Section -->
+    <section class="section" id="automation">
+        <div class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">AI Automation Capabilities</h2>
+                <p class="section-subtitle">Transform your workflow with intelligent automation that learns, adapts, and executes tasks with precision and efficiency.</p>
+            </div>
+
+            <div class="automation-showcase">
+                <div class="automation-card">
+                    <div class="automation-header">
+                        <h3 class="automation-title">Business Process Automation</h3>
+                        <p class="automation-subtitle">Streamline operations and reduce manual effort</p>
+                    </div>
+                    <div class="automation-content">
+                        <ul class="automation-list">
+                            <li>Document processing and data extraction</li>
+                            <li>Email sorting and response automation</li>
+                            <li>Invoice processing and approval workflows</li>
+                            <li>Customer support ticket routing</li>
+                            <li>Report generation and distribution</li>
+                            <li>Meeting scheduling and calendar management</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="automation-card">
+                    <div class="automation-header">
+                        <h3 class="automation-title">Development & Testing</h3>
+                        <p class="automation-subtitle">Accelerate software development lifecycle</p>
+                    </div>
+                    <div class="automation-content">
+                        <ul class="automation-list">
+                            <li>Automated code generation and refactoring</li>
+                            <li>Unit test creation and execution</li>
+                            <li>Bug detection and fix suggestions</li>
+                            <li>Code review and quality analysis</li>
+                            <li>Deployment pipeline automation</li>
+                            <li>Performance monitoring and optimization</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="automation-card">
+                    <div class="automation-header">
+                        <h3 class="automation-title">Marketing & Sales</h3>
+                        <p class="automation-subtitle">Boost conversion and customer engagement</p>
+                    </div>
+                    <div class="automation-content">
+                        <ul class="automation-list">
+                            <li>Lead scoring and qualification</li>
+                            <li>Personalized email campaigns</li>
+                            <li>Social media content scheduling</li>
+                            <li>Customer segmentation and targeting</li>
+                            <li>A/B testing and optimization</li>
+                            <li>Sales forecast and pipeline management</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="automation-card">
+                    <div class="automation-header">
+                        <h3 class="automation-title">Data & Analytics</h3>
+                        <p class="automation-subtitle">Transform data into actionable insights</p>
+                    </div>
+                    <div class="automation-content">
+                        <ul class="automation-list">
+                            <li>Real-time data processing and analysis</li>
+                            <li>Automated dashboard creation</li>
+                            <li>Anomaly detection and alerting</li>
+                            <li>Predictive modeling and forecasting</li>
+                            <li>Data cleaning and preprocessing</li>
+                            <li>Custom report generation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="automation-card">
+                    <div class="automation-header">
+                        <h3 class="automation-title">Customer Service</h3>
+                        <p class="automation-subtitle">Deliver exceptional customer experiences</p>
+                    </div>
+                    <div class="automation-content">
+                        <ul class="automation-list">
+                            <li>24/7 intelligent chatbot support</li>
+                            <li>Ticket prioritization and routing</li>
+                            <li>Sentiment analysis and escalation</li>
+                            <li>Knowledge base auto-updates</li>
+                            <li>Customer feedback analysis</li>
+                            <li>Response time optimization</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="automation-card">
+                    <div class="automation-header">
+                        <h3 class="automation-title">Financial Operations</h3>
+                        <p class="automation-subtitle">Streamline financial processes and compliance</p>
+                    </div>
+                    <div class="automation-content">
+                        <ul class="automation-list">
+                            <li>Expense tracking and categorization</li>
+                            <li>Fraud detection and prevention</li>
+                            <li>Automated reconciliation processes</li>
+                            <li>Tax calculation and filing assistance</li>
+                            <li>Budget monitoring and alerts</li>
+                            <li>Compliance reporting automation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Chat Section -->
+    <section class="section chat-section" id="chat">
+        <div class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">Chat with Rudra AI</h2>
+                <p class="section-subtitle">Experience the power of AI conversation in real-time. Ask questions, get help, or just have a conversation.</p>
+            </div>
+
+            <div class="interactive-chat">
+                <div class="chat-window">
+                    <div class="chat-header">
+                        <div class="chat-dots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        <div class="chat-title">Live Chat with Rudra</div>
+                    </div>
+                    <div class="chat-messages" id="liveMessages">
+                        <div class="message ai">
+                            <div class="message-avatar">R</div>
+                            <div class="message-content">
+                                Ready to chat! Ask me anything about coding, AI, creative projects, automation, or just have a conversation. I'm here to help!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" placeholder="Type your message..." id="chatInput">
+                    <button class="chat-send" id="sendBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="section" id="download">
+        <div class="section-container">
+            <div class="section-header">
+                <h2 class="section-title">Get Rudra AI</h2>
+                <p class="section-subtitle">Download Rudra AI and start transforming your workflow with the power of artificial intelligence.</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem;">
+                <div class="cta-container">
+                    <a href="#" class="btn btn-primary" style="font-size: 1.2rem; padding: 1.5rem 3rem;">
+                        <span>⬇</span> Download for Windows
+                    </a>
+                    <a href="#" class="btn btn-primary" style="font-size: 1.2rem; padding: 1.5rem 3rem;">
+                        <span>⬇</span> Download for Mac
+                    </a>
+                    <a href="#" class="btn btn-secondary" style="font-size: 1.2rem; padding: 1.5rem 3rem;">
+                        <span>🌐</span> Web Version
+                    </a>
+                </div>
+                
+                <p style="margin-top: 2rem; color: #a1a1aa;">
+                    Free to try • Premium features available • No credit card required
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // 3D Scene Setup
+        let scene, camera, renderer, particles3D;
+
+        function init3D() {
+            // Scene
+            scene = new THREE.Scene();
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 50;
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({
+                canvas: document.getElementById('threejs-canvas'),
+                alpha: true,
+                antialias: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            // Create 3D particle system
+            const particleCount = 200;
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 200;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 100;
+
+                // Purple to blue gradient colors
+                const t = Math.random();
+                colors[i * 3] = 0.4 + t * 0.2;     // R
+                colors[i * 3 + 1] = 0.2 + t * 0.4; // G
+                colors[i * 3 + 2] = 0.8 + t * 0.2; // B
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 2,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            particles3D = new THREE.Points(geometry, material);
+            scene.add(particles3D);
+
+            // Create floating geometric shapes
+            createFloatingShapes();
+
+            // Animation loop
+            animate3D();
+        }
+
+        function createFloatingShapes() {
+            const shapes = [];
+            const shapeCount = 10;
+
+            for (let i = 0; i < shapeCount; i++) {
+                let geometry, material, mesh;
+
+                // Random shape type
+                const shapeType = Math.floor(Math.random() * 3);
+                
+                switch(shapeType) {
+                    case 0: // Cube
+                        geometry = new THREE.BoxGeometry(2, 2, 2);
+                        break;
+                    case 1: // Sphere
+                        geometry = new THREE.SphereGeometry(1, 8, 6);
+                        break;
+                    case 2: // Octahedron
+                        geometry = new THREE.OctahedronGeometry(1.5);
+                        break;
+                }
+
+                material = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color().setHSL(0.7 + Math.random() * 0.1, 0.8, 0.6),
+                    transparent: true,
+                    opacity: 0.3,
+                    wireframe: true
+                });
+
+                mesh = new THREE.Mesh(geometry, material);
+                
+                // Random position
+                mesh.position.set(
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 50
+                );
+
+                // Random rotation speed
+                mesh.rotationSpeed = {
+                    x: (Math.random() - 0.5) * 0.02,
+                    y: (Math.random() - 0.5) * 0.02,
+                    z: (Math.random() - 0.5) * 0.02
+                };
+
+                shapes.push(mesh);
+                scene.add(mesh);
+            }
+
+            // Store shapes for animation
+            scene.userData.shapes = shapes;
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+
+            // Rotate particle system
+            if (particles3D) {
+                particles3D.rotation.x += 0.001;
+                particles3D.rotation.y += 0.002;
+            }
+
+            // Animate floating shapes
+            if (scene.userData.shapes) {
+                scene.userData.shapes.forEach(shape => {
+                    shape.rotation.x += shape.rotationSpeed.x;
+                    shape.rotation.y += shape.rotationSpeed.y;
+                    shape.rotation.z += shape.rotationSpeed.z;
+                });
+            }
+
+            // Mouse interaction
+            const mouseX = (window.mouseX || 0) * 0.001;
+            const mouseY = (window.mouseY || 0) * 0.001;
+            
+            camera.position.x += (mouseX - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+
+        // Mouse movement tracking
+        document.addEventListener('mousemove', (event) => {
+            window.mouseX = (event.clientX - window.innerWidth / 2);
+            window.mouseY = (event.clientY - window.innerHeight / 2);
+        });
+
+        // Responsive 3D
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        window.addEventListener('resize', onWindowResize);
+
+        // Create animated particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Simulate chat functionality
+        function setupChat() {
+            const chatInput = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const liveMessages = document.getElementById('liveMessages');
+
+            const responses = [
+                "That's a fascinating question! I can help you explore that topic in depth.",
+                "I can definitely assist you with coding projects, automation workflows, and technical challenges.",
+                "Interesting! Here's my analysis of that topic with some actionable insights...",
+                "I'm designed to be helpful, creative, and intelligent in all my interactions.",
+                "Would you like me to break that down into smaller, manageable steps?",
+                "I can help you explore different approaches and find the most efficient solution.",
+                "That's exactly the kind of problem AI excels at solving. Let me show you how...",
+                "Great question! I can automate that process for you. Here's how we can approach it...",
+                "I love creative challenges! Let me help you brainstorm some innovative solutions."
+            ];
+
+            function addMessage(content, isUser = false) {
+                const message = document.createElement('div');
+                message.className = `message ${isUser ? 'user' : 'ai'}`;
+                message.innerHTML = `
+                    <div class="message-avatar">${isUser ? 'U' : 'R'}</div>
+                    <div class="message-content">${content}</div>
+                `;
+                liveMessages.appendChild(message);
+                liveMessages.scrollTop = liveMessages.scrollHeight;
+            }
+
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (!message) return;
+
+                addMessage(message, true);
+                chatInput.value = '';
+
+                // Show typing indicator and respond
+                setTimeout(() => {
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    addMessage(randomResponse);
+                }, 1000 + Math.random() * 1000);
+            }
+
+            sendBtn.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+        }
+
+        // Demo chat animation
+        function animateDemoChat() {
+            const demoMessages = document.getElementById('demoMessages');
+            const typingMessage = document.getElementById('typingMessage');
+
+            setInterval(() => {
+                typingMessage.style.display = 'flex';
+                setTimeout(() => {
+                    typingMessage.style.display = 'none';
+                }, 2000);
+            }, 8000);
+        }
+
+        // Smooth scrolling for navigation
+        function setupSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+
+        // Intersection Observer for animations
+        function setupScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe cards and sections
+            document.querySelectorAll('.capability-card, .automation-card, .purpose-item').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if WebGL is available before initializing 3D
+            if (window.WebGLRenderingContext) {
+                try {
+                    init3D();
+                } catch (error) {
+                    console.log('3D initialization failed, continuing without 3D effects');
+                }
+            }
+            
+            createParticles();
+            setupChat();
+            animateDemoChat();
+            setupSmoothScrolling();
+            setupScrollAnimations();
+        });
+    </script>
+</body>
+</html>
+                
